@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asad Rasool | Automation SQA Engineer · 3D Portfolio</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- GSAP CDN for advanced animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Three.js for 3D Background -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+            background: #050510;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Canvas 3D Background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* Content above 3D */
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Glassmorphism Navbar */
+        .navbar {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            max-width: 1200px;
+            padding: 1rem 2rem;
+            background: rgba(10, 10, 30, 0.4);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient 3s linear infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, #a855f7, #3b82f6);
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 8%;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-left {
+            flex: 1;
+        }
+
+        .badge {
+            background: rgba(168, 85, 247, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            display: inline-block;
+            font-size: 0.8rem;
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            margin-bottom: 1.5rem;
+            backdrop-filter: blur(5px);
+        }
+
+        .hero-left h1 {
+            font-size: 4rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1rem;
+            color: #a0a0c0;
+            margin: 1.5rem 0;
+            max-width: 550px;
+            line-height: 1.6;
+        }
+
+        .contact-info-hero {
+            font-size: 0.85rem;
+            color: #b0b0d0;
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .contact-info-hero span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px 12px;
+            border-radius: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            padding: 12px 32px;
+            border-radius: 40px;
+            border: none;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(168, 85, 247, 0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid rgba(168, 85, 247, 0.6);
+            padding: 10px 30px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-outline:hover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .hero-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .floating-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 280px;
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .floating-card i {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 8%;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title span {
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Skills 3D Cards */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-3d-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.8rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .skill-3d-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            border-color: #a855f7;
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.2);
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+            color: #a855f7;
+            margin-bottom: 1rem;
+        }
+
+        /* Experience Cards */
+        .exp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .exp-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+        }
+
+        .exp-card:hover {
+            border-color: #a855f7;
+            transform: translateY(-5px);
+        }
+
+        .exp-card h3 {
+            color: #a855f7;
+            margin-bottom: 5px;
+        }
+
+        .exp-company {
+            color: #86a8cf;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .exp-date {
+            font-size: 0.75rem;
+            background: rgba(168, 85, 247, 0.2);
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .exp-desc {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .exp-desc li {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .exp-desc li i {
+            color: #a855f7;
+            font-size: 0.7rem;
+        }
+
+        /* Projects Showcase */
+        .projects-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .project-showcase-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: 0.4s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-showcase-card:hover {
+            transform: scale(1.02);
+            border-color: #a855f7;
+        }
+
+        .project-img {
+            height: 160px;
+            background: linear-gradient(135deg, #a855f733, #3b82f633);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .project-img i {
+            font-size: 3.5rem;
+            color: #a855f7;
+        }
+
+        .project-info {
+            padding: 1.5rem;
+        }
+
+        .project-info h3 {
+            margin-bottom: 8px;
+        }
+
+        .project-info p {
+            font-size: 0.85rem;
+            color: #b0b0d0;
+        }
+
+        /* Education */
+        .edu-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 1.8rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        /* Contact */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .contact-form input, .contact-form textarea {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .contact-form input:focus, .contact-form textarea:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .navbar { width: 95%; padding: 0.8rem 1.5rem; }
+            .nav-links { gap: 1rem; }
+            .nav-links a { font-size: 0.8rem; }
+            .hero-left h1 { font-size: 2.5rem; }
+            .contact-wrapper { grid-template-columns: 1fr; }
+            section { padding: 4rem 5%; }
+            .hero { padding: 0 5%; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="content">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">ASAD<span style="color:white;"> RASOOL</span></div>
+        <ul class="nav-links">
+            <li><a href="#home">HOME</a></li>
+            <li><a href="#experience">EXPERIENCE</a></li>
+            <li><a href="#skills">SKILLS</a></li>
+            <li><a href="#projects">PROJECTS</a></li>
+            <li><a href="#contact">CONTACT</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section with Asad's Details -->
+    <section id="home" class="hero">
+        <div class="hero-left">
+            <div class="badge">✦ Automation SQA Engineer ✦</div>
+            <h1>ASAD <span class="gradient-text">RASOOL</span></h1>
+            <div class="hero-desc">
+                Detail-oriented SQA Engineer with 3+ years of experience in manual and automation testing. 
+            </div>
+            <div class="btn-group" style="margin-top: 1.5rem;">
+                <button class="btn-primary" onclick="alert('📄 Asad Rasool - Resume (Demo)')"><i class="fas fa-download"></i> Download Resume</button>
+                <button class="btn-outline" onclick="scrollToContact()"><i class="fas fa-paper-plane"></i> Hire Me</button>
+            </div>
+        </div>
+        <div class="hero-right">
+            <div class="floating-card">
+                <i class="fas fa-bug"></i>
+                <h3 style="margin: 1rem 0;">3+ Years Experience</h3>
+                <p style="font-size: 0.85rem;">Playwright · Selenium · API Testing</p>
+                <hr style="margin: 1rem 0; border-color: rgba(255,255,255,0.1);">
+                <p style="font-size: 0.8rem;">✓ Manual & Automation Expert<br>✓ Backend Testing Specialist</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Work Experience Section -->
+    <section id="experience">
+        <h2 class="section-title">Work <span>Experience</span></h2>
+        <div class="exp-grid">
+            <div class="exp-card">
+                <h3>Senior SQA Engineer</h3>
+                <div class="exp-company">Hostings House, Johar Town Lahore</div>
+                <div class="exp-date">2024 - 2026</div>
+                <ul class="exp-desc">
+                    <li><i class="fas fa-caret-right"></i> Designed and executed test cases across multiple modules</li>
+                    <li><i class="fas fa-caret-right"></i> Performed smoke, sanity, and regression testing after each build</li>
+                    <li><i class="fas fa-caret-right"></i> Contributed to backend automation using Node.js, TypeScript, and PostgreSQL</li>
+                </ul>
+            </div>
+            <div class="exp-card">
+                <h3>Associate SQA Engineer</h3>
+                <div class="exp-company">TechnoCares, Model Town Lahore</div>
+                <div class="exp-date">2022 - 2024</div>
+                <ul class="exp-desc">
+                    <li><i class="fas fa-caret-right"></i> Developed and executed test cases for multiple projects</li>
+                    <li><i class="fas fa-caret-right"></i> Collaborated with cross-functional teams to ensure quality delivery</li>
+                    <li><i class="fas fa-caret-right"></i> Prepared technical release notes after each sprint</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <h2 class="section-title">Core <span>Competencies</span></h2>
+        <div class="skills-grid">
+            <div class="skill-3d-card"><div class="skill-icon"><i class="fas fa-vial"></i></div><h3>Testing Types</h3><p>Automation · Manual · Functional · Regression · Smoke</p></div>
+            <div class="skill-3d-card"><div class="skill-icon"><i class="fas fa-robot"></i></div><h3>Automation Tools</h3><p>Playwright · Selenium · Postman · Hoppscotch</p></div>
+            <div class="skill-3d-card"><div class="skill-icon"><i class="fas fa-code"></i></div><h3>Languages</h3><p>Python · JavaScript · TypeScript · C++</p></div>
+            <div class="skill-3d-card"><div class="skill-icon"><i class="fab fa-jira"></i></div><h3>Project Management</h3><p>JIRA · Trello · GitHub · VS Code</p></div>
+            <div class="skill-3d-card"><div class="skill-icon"><i class="fas fa-shield-alt"></i></div><h3>Additional</h3><p>Technical Writing · Release Notes · Basic Pen Testing · Burp Suite</p></div>
+            <div class="skill-3d-card"><div class="skill-icon"><i class="fas fa-server"></i></div><h3>Backend & DevOps</h3><p>cPanel · PostgreSQL · Node.js</p></div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <h2 class="section-title">Featured <span>Projects</span></h2>
+        <div class="projects-showcase">
+            <div class="project-showcase-card">
+                <div class="project-img"><i class="fas fa-envelope-open-text"></i></div>
+                <div class="project-info">
+                    <h3>Mumara</h3>
+                    <p>Email marketing platform for business growth through automated campaigns. Full regression and automation suite implemented.</p>
+                </div>
+            </div>
+            <div class="project-showcase-card">
+                <div class="project-img"><i class="fas fa-car"></i></div>
+                <div class="project-info">
+                    <h3>JOClaims (cross-platform)</h3>
+                    <p>Platform for car buying and repair services in Jordan and Bahrain. API testing + cross-browser validation.</p>
+                </div>
+            </div>
+            <div class="project-showcase-card">
+                <div class="project-img"><i class="fas fa-mobile-alt"></i></div>
+                <div class="project-info">
+                    <h3>Sparta</h3>
+                    <p>Mobile app for inspection of industrial equipment and automotive components. Manual + automation testing.</p>
+                </div>
+            </div>
+            <div class="project-showcase-card">
+                <div class="project-img"><i class="fas fa-truck"></i></div>
+                <div class="project-info">
+                    <h3>Movemate</h3>
+                    <p>Logistics platform for transportation of car parts. End-to-end test case design and execution.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education -->
+    <section>
+        <h2 class="section-title"><span>Education</span></h2>
+        <div class="edu-card">
+            <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: #a855f7; margin-bottom: 1rem; display: block;"></i>
+            <h3>BS Computer Science</h3>
+            <p>Virtual University of Pakistan</p>
+            <p style="color: #a0a0c0; font-size: 0.85rem;">2025 - Present</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2 class="section-title">Let's <span>Connect</span></h2>
+        <div class="contact-wrapper">
+            <div class="contact-form">
+                <input type="text" id="name" placeholder="Full Name">
+                <input type="email" id="email" placeholder="Email Address">
+                <textarea rows="5" id="message" placeholder="Tell me about your QA needs..."></textarea>
+                <button class="btn-primary" onclick="sendMsg()" style="width:100%;"><i class="fas fa-paper-plane"></i> Send Message</button>
+            </div>
+            <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 2rem;">
+                <p><i class="fas fa-envelope" style="color:#a855f7; width: 30px;"></i> asadakbeer@gmail.com</p>
+                <p style="margin:1rem 0;"><i class="fas fa-phone" style="color:#a855f7; width: 30px;"></i> +923321709473</p>
+                <p><i class="fas fa-map-marker-alt" style="color:#a855f7; width: 30px;"></i> Farooq-e-Azam Colony, Rawalpindi</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 Asad Rasool — Automation SQA Engineer | Precision. Quality. Trust.</p>
+    </footer>
+</div>
+
+<script type="module">
+    import * as THREE from 'three';
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x050510, 1);
+    container.appendChild(renderer.domElement);
+    
+    // Particle system for 3D background
+    const particlesGeometry = new THREE.BufferGeometry();
+    const particlesCount = 1200;
+    const posArray = new Float32Array(particlesCount * 3);
+    for(let i = 0; i < particlesCount * 3; i += 3) {
+        posArray[i] = (Math.random() - 0.5) * 200;
+        posArray[i+1] = (Math.random() - 0.5) * 100;
+        posArray[i+2] = (Math.random() - 0.5) * 100 - 50;
+    }
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const particlesMaterial = new THREE.PointsMaterial({ size: 0.2, color: 0xa855f7, transparent: true, opacity: 0.5 });
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
+    
+    // Central glowing torus
+    const torusGeometry = new THREE.TorusGeometry(2.5, 0.3, 64, 200);
+    const torusMaterial = new THREE.MeshStandardMaterial({ color: 0xa855f7, emissive: 0x3b82f6, emissiveIntensity: 0.4 });
+    const torus = new THREE.Mesh(torusGeometry, torusMaterial);
+    scene.add(torus);
+    
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x404060);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xa855f7, 0.8, 100);
+    pointLight.position.set(5, 5, 5);
+    scene.add(pointLight);
+    camera.position.z = 20;
+    
+    let mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', (event) => {
+        mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (event.clientY / window.innerHeight) * 2 - 1;
+    });
+    
+    function animate() {
+        requestAnimationFrame(animate);
+        torus.rotation.x += 0.005;
+        torus.rotation.y += 0.01;
+        particlesMesh.rotation.y += 0.0005;
+        particlesMesh.rotation.x += 0.0003;
+        camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+        camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.05;
+        camera.lookAt(0, 0, 0);
+        renderer.render(scene, camera);
+    }
+    animate();
+    
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
+
+<script>
+    // GSAP Scroll Animations
+    gsap.registerPlugin(ScrollTrigger);
+    
+    gsap.utils.toArray('.skill-3d-card, .project-showcase-card, .exp-card, .edu-card').forEach(card => {
+        gsap.from(card, {
+            scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none reverse'
+            },
+            opacity: 0,
+            y: 60,
+            duration: 0.8,
+            ease: 'power2.out'
+        });
+    });
+    
+    gsap.from('.hero-left', {
+        scrollTrigger: { trigger: '.hero', start: 'top 80%' },
+        opacity: 0,
+        x: -80,
+        duration: 1
+    });
+    
+    function scrollToContact() {
+        document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function sendMsg() {
+        let n = document.getElementById('name').value;
+        let e = document.getElementById('email').value;
+        let m = document.getElementById('message').value;
+        if (!n || !e || !m) alert('❌ Please fill all fields');
+        else if (!e.includes('@')) alert('❌ Please enter a valid email');
+        else alert('✅ Message sent successfully! Asad will reply within 24 hours.');
+    }
+    
+    // Smooth scroll for nav
+    document.querySelectorAll('.nav-links a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            const section = document.querySelector(targetId);
+            if(section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+</script>
+</body>
+</html>
